@@ -2,11 +2,12 @@
 	<canvas id="c"></canvas>
 	<div>
 		<h1>3kbrot</h1>
-		<label for="iz-re">Inital Z (Real)</label>
-		<input id="iz-re" type="number" value="0" step="0.1" />
 
-		<label for="iz-im">Inital Z (Imaginary)</label>
-		<input id="iz-im" type="number" value="0" step="0.1" />
+		<label for="izr">Inital Z (real)</label>
+		<input id="izr" type="number" value="0" step="0.1" />
+
+		<label for="izi">Inital Z (imaginary)</label>
+		<input id="izi" type="number" value="0" step="0.1" />
 
 		<footer>
 			By <a href="https://github.com/ethmarks">Ethan Marks</a>
@@ -25,9 +26,7 @@
 		}
 		div {
 			color: white;
-			font-family:
-				"Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-				"Lucida Sans", Arial, sans-serif;
+			font-family: "Trebuchet MS", sans-serif;
 			margin: 1rem;
 			position: absolute;
 			top: 0;
@@ -218,8 +217,8 @@
 		});
 
 		let isDragging;
-		let dragStartX = 0;
-		let dragStartY = 0;
+		let centerX = 0;
+		let centerY = 0;
 
 		function resetDrag() {
 			isDragging = false;
@@ -229,8 +228,8 @@
 
 		window.addEventListener("pointerdown", (event) => {
 			isDragging = true;
-			dragStartX = event.clientX;
-			dragStartY = event.clientY;
+			centerX = event.clientX;
+			centerY = event.clientY;
 			document.body.style.cursor = "grabbing";
 		});
 
@@ -240,31 +239,32 @@
 		window.addEventListener("pointermove", (event) => {
 			if (!isDragging) return;
 
-			const dragDeltaX = event.clientX - dragStartX;
-			const dragDeltaY = event.clientY - dragStartY;
+			const dragDeltaX = event.clientX - centerX;
+			const dragDeltaY = event.clientY - centerY;
 
 			viewportX -= (dragDeltaX / viewportScale) * DRAG_SENSITIVITY;
 			viewportY += (dragDeltaY / viewportScale) * DRAG_SENSITIVITY;
 
-			dragStartX = event.clientX;
-			dragStartY = event.clientY;
+			centerX = event.clientX;
+			centerY = event.clientY;
 
 			render();
 		});
 
-		/** @type {HTMLInputElement} */
-		const isRe = document.getElementById("iz-re");
-		isRe.addEventListener("input", (event) => {
-			initialZReal = isRe.value;
+		const initialZRealEl = document.getElementById("izr");
+		const initialZImaginaryEl = document.getElementById("izi");
+
+		initialZRealEl.addEventListener("input", () => {
+			initialZReal = initialZRealEl.value;
+			render();
+		});
+		initialZImaginaryEl.addEventListener("input", () => {
+			initialZImaginary = initialZImaginaryEl.value;
 			render();
 		});
 
-		/** @type {HTMLInputElement} */
-		const isIm = document.getElementById("iz-im");
-		isIm.addEventListener("input", (event) => {
-			initialZImaginary = isIm.value;
-			render();
-		});
+		initialZRealEl.value = 0;
+		initialZImaginaryEl.value = 0;
 
 		render();
 	</script>
