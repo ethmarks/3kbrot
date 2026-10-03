@@ -1,16 +1,19 @@
 {
-  "name": "3kbrot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.28.0",
-  "devDependencies": {
-    "terser": "^5.51.2"
-  }
+	"name": "3kbrot",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"build": "node build.mjs",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"prepare": "husky"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.28.0",
+	"devDependencies": {
+		"husky": "^9.1.7",
+		"terser": "^5.51.2"
+	}
 }
