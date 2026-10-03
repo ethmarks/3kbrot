@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "node build.mjs && exit 0",
+		"dev": "live-server src/index.html",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"prepare": "husky"
 	},
@@ -14,6 +15,7 @@
 	"packageManager": "pnpm@10.28.0",
 	"devDependencies": {
 		"husky": "^9.1.7",
+		"live-server": "^1.2.2",
 		"terser": "^5.51.2"
 	}
 }
