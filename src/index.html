@@ -116,10 +116,16 @@
 
 					const pixelIndex = (pixelY * c.width + pixelX) * 4;
 
+					// https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set#Continuous_(smooth)_coloring
+					const nu = Math.log2(
+						Math.log2(real * real + imaginary * imaginary),
+					);
+					const smoothIterations = iterations + 1 - nu;
+
 					const t =
-						iterations === MAX_ITERATIONS
+						smoothIterations === MAX_ITERATIONS
 							? 0
-							: iterations / MAX_ITERATIONS;
+							: smoothIterations / MAX_ITERATIONS;
 
 					setPixel(pixelIndex, t);
 				}
