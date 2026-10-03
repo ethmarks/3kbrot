@@ -6,37 +6,83 @@
 			overflow: hidden;
 			background: black;
 		}
+		canvas {
+			width: 100vw;
+			height: 100vh;
+		}
 	</style>
 	<script>
 		/** @type {CanvasRenderingContext2D} */
 		const ctx = c.getContext("2d");
 
-		const SCALE = 300;
+		// these two are similar but serve different purposes so let me explain
+		/** this is to see more details of the fractal */
+		let viewportScale = 300;
+		/** this is to make rendering cheaper  */
+		let superscaleFactor = 1;
+
 		const MAX_ITERATIONS = 100;
 
-		c.width = innerWidth;
-		c.height = innerHeight;
+		c.width = innerWidth / superscaleFactor;
+		c.height = innerHeight / superscaleFactor;
 
 		const imgData = ctx.getImageData(0, 0, c.width, c.height);
 		const pixels = imgData.data;
 
-		function draw() {
-			for (let y = 0; y < c.height; y++) {
-				for (let x = 0; x < c.width; x++) {
-					const cx = (x - c.width / 2) / 300;
-					const cy = (y - c.height / 2) / 300;
+		/**
+		 * this function mixes the palette calculation and image data math all
+		 * in one
+		 *
+		 * @param pixelIndex the index of the pixel, obviously
+		 * @param t the 0-1 normalized value used to generate the color
+		 */
+		function setPixel(pixelIndex, t) {
+			const brightness = t * 255;
 
+			const red = brightness;
+			const green = brightness;
+			const blue = brightness;
+
+			pixels[pixelIndex + 0] = red;
+			pixels[pixelIndex + 1] = green;
+			pixels[pixelIndex + 2] = blue;
+
+			// I always want the alpha value to be fully opaque
+			pixels[pixelIndex + 3] = 255;
+		}
+
+		function draw() {
+			for (let pixelY = 0; pixelY < c.height; pixelY++) {
+				for (let pixelX = 0; pixelX < c.width; pixelX++) {
+					const scaledX =
+						(pixelX - c.width / 2) /
+						(viewportScale / superscaleFactor);
+					const scaledY =
+						(pixelY - c.height / 2) /
+						(viewportScale / superscaleFactor);
+
+					// each complex part of z
 					let real = 0;
 					let imaginary = 0;
+
 					let iterations = 0;
 
 					while (
+						// escape condition cuz if the magnitude of z is ever
+						// greater than 2, it's mathematically guaranteed to
+						// approach infinity
+						//
+						// -> |z| < 2
+						// -> sqrt(re^2 + im^2) < 2
+						// -> re^2 + im^2 < 4
 						real * real + imaginary * imaginary < 4 &&
+						// because otherwise we'd never stop calculating for
+						// some pixels
 						iterations < MAX_ITERATIONS
 					) {
 						const realNext =
-							real * real - imaginary * imaginary + cx;
-						const imaginaryNext = 2 * real * imaginary + cy;
+							real * real - imaginary * imaginary + scaledX;
+						const imaginaryNext = 2 * real * imaginary + scaledY;
 
 						real = realNext;
 						imaginary = imaginaryNext;
@@ -44,17 +90,14 @@
 						iterations++;
 					}
 
-					const brightness =
+					const pixelIndex = (pixelY * c.width + pixelX) * 4;
+
+					const t =
 						iterations === MAX_ITERATIONS
 							? 0
-							: (255 * iterations) / MAX_ITERATIONS;
+							: iterations / MAX_ITERATIONS;
 
-					const pixelIndex = (y * c.width + x) * 4;
-
-					pixels[pixelIndex + 0] = brightness; // red
-					pixels[pixelIndex + 1] = brightness; // green
-					pixels[pixelIndex + 2] = brightness; // blue
-					pixels[pixelIndex + 3] = 255; // alpha
+					setPixel(pixelIndex, t);
 				}
 			}
 
