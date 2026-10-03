@@ -1,15 +1,43 @@
 <body>
-	<h1>it works!</h1>
-	<p>testing precommit hook</p>
+	<canvas id="c"></canvas>
 	<style>
 		body {
+			margin: 0;
+			overflow: hidden;
 			background: black;
-			color: white;
-			font-family: sans-serif;
 		}
 	</style>
 	<script>
-		const title = document.querySelector("h1");
-		title.onclick = () => (title.textContent = "you clicked it");
+		const ctx = c.getContext("2d");
+
+		// variables for the entire app
+		let player = { x: 100, y: 100 };
+
+		function update(dt) {
+			// move 50 pixels every second, and wrap around at the edge
+			player.x = (player.x + 50 * dt) % c.width;
+		}
+
+		function draw(time) {
+			ctx.fillStyle = "black";
+			ctx.fillRect(0, 0, c.width, c.height);
+			ctx.fillStyle = "tomato";
+			ctx.fillRect(player.x, player.y, 20, 20);
+		}
+
+		onresize = () => {
+			c.width = innerWidth;
+			c.height = innerHeight;
+		};
+		onresize();
+
+		let last = 0;
+		function frame(now) {
+			update(Math.min((now - last) / 1000, 0.1));
+			last = now;
+			draw(now);
+			requestAnimationFrame(frame);
+		}
+		requestAnimationFrame(frame);
 	</script>
 </body>
