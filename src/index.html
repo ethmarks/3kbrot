@@ -22,7 +22,7 @@
 		const PREVIEW_RES = 6;
 
 		/** how long to wait before rendering in full resolution */
-		const FULLRES_DELAY = 200;
+		const FULLRES_DELAY = 1000;
 
 		// these two are similar but serve different purposes so let me explain
 		/** this is to see more details of the fractal */
@@ -34,6 +34,7 @@
 		let viewportY = 0;
 
 		const SCROLL_SENSITIVITY = 1.0015;
+		const DRAG_SENSITIVITY = 0.5;
 
 		const MAX_ITERATIONS = 100;
 
@@ -163,6 +164,41 @@
 
 		window.addEventListener("wheel", (event) => {
 			viewportScale *= Math.pow(SCROLL_SENSITIVITY, -event.deltaY);
+			render();
+		});
+
+		let isDragging;
+		let dragStartX = 0;
+		let dragStartY = 0;
+
+		function resetDrag() {
+			isDragging = false;
+			document.body.style.cursor = "grab";
+		}
+		resetDrag();
+
+		window.addEventListener("pointerdown", (event) => {
+			isDragging = true;
+			dragStartX = event.clientX;
+			dragStartY = event.clientY;
+			document.body.style.cursor = "grabbing";
+		});
+
+		window.addEventListener("pointerup", resetDrag);
+		window.addEventListener("pointercancel", resetDrag);
+
+		window.addEventListener("pointermove", (event) => {
+			if (!isDragging) return;
+
+			const dragDeltaX = event.clientX - dragStartX;
+			const dragDeltaY = event.clientY - dragStartY;
+
+			viewportX -= (dragDeltaX / viewportScale) * DRAG_SENSITIVITY;
+			viewportY += (dragDeltaY / viewportScale) * DRAG_SENSITIVITY;
+
+			dragStartX = event.clientX;
+			dragStarY = event.clienY;
+
 			render();
 		});
 
