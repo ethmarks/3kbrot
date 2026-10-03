@@ -48,19 +48,20 @@
 		};
 
 		// https://www.stevenfrady.com/tools/palette?p=0.1,0.5,0.5,1,1,0.81,0.69,1,0.41,0.52,0.5,0.67
-		function getPalette(t) {
+		function palette(t, colorIndex) {
 			const a = [0.1, 0.5, 0.5];
 			const b = [1, 1, 0.81];
 			const c = [0.69, 1, 0.41];
 			const d = [0.52, 0.5, 0.67];
 
-			return (colorIndex) =>
+			return (
 				(a[colorIndex] +
 					b[colorIndex] *
 						Math.cos(
 							2 * Math.PI * (c[colorIndex] * t + d[colorIndex]),
 						)) *
-				255;
+				255
+			);
 		}
 
 		/**
@@ -71,11 +72,9 @@
 		 * @param {number} t the 0-1 normalized value used to generate the color
 		 */
 		function setPixel(pixelIndex, t) {
-			const palette = getPalette(t);
-
-			pixels[pixelIndex + 0] = palette(0); // red
-			pixels[pixelIndex + 1] = palette(1); // green
-			pixels[pixelIndex + 2] = palette(2); // blue
+			pixels[pixelIndex + 0] = palette(t, 0); // red
+			pixels[pixelIndex + 1] = palette(t, 1); // green
+			pixels[pixelIndex + 2] = palette(t, 2); // blue
 
 			// I want the alpha value to always be fully opaque
 			pixels[pixelIndex + 3] = 255;
