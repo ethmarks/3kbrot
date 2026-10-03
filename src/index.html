@@ -8,36 +8,59 @@
 		}
 	</style>
 	<script>
+		/** @type {CanvasRenderingContext2D} */
 		const ctx = c.getContext("2d");
 
-		// variables for the entire app
-		let player = { x: 100, y: 100 };
+		const SCALE = 300;
+		const MAX_ITERATIONS = 100;
 
-		function update(dt) {
-			// move 50 pixels every second, and wrap around at the edge
-			player.x = (player.x + 50 * dt) % c.width;
+		c.width = innerWidth;
+		c.height = innerHeight;
+
+		const imgData = ctx.getImageData(0, 0, c.width, c.height);
+		const pixels = imgData.data;
+
+		function draw() {
+			for (let y = 0; y < c.height; y++) {
+				for (let x = 0; x < c.width; x++) {
+					const cx = (x - c.width / 2) / 300;
+					const cy = (y - c.height / 2) / 300;
+
+					let real = 0;
+					let imaginary = 0;
+					let iterations = 0;
+
+					while (
+						real * real + imaginary * imaginary < 4 &&
+						iterations < MAX_ITERATIONS
+					) {
+						const realNext =
+							real * real - imaginary * imaginary + cx;
+						const imaginaryNext = 2 * real * imaginary + cy;
+
+						real = realNext;
+						imaginary = imaginaryNext;
+
+						iterations++;
+					}
+
+					const brightness =
+						iterations === MAX_ITERATIONS
+							? 0
+							: (255 * iterations) / MAX_ITERATIONS;
+
+					const pixelIndex = (y * c.width + x) * 4;
+
+					pixels[pixelIndex + 0] = brightness; // red
+					pixels[pixelIndex + 1] = brightness; // green
+					pixels[pixelIndex + 2] = brightness; // blue
+					pixels[pixelIndex + 3] = 255; // alpha
+				}
+			}
+
+			ctx.putImageData(imgData, 0, 0);
 		}
 
-		function draw(time) {
-			ctx.fillStyle = "black";
-			ctx.fillRect(0, 0, c.width, c.height);
-			ctx.fillStyle = "tomato";
-			ctx.fillRect(player.x, player.y, 20, 20);
-		}
-
-		onresize = () => {
-			c.width = innerWidth;
-			c.height = innerHeight;
-		};
-		onresize();
-
-		let last = 0;
-		function frame(now) {
-			update(Math.min((now - last) / 1000, 0.1));
-			last = now;
-			draw(now);
-			requestAnimationFrame(frame);
-		}
-		requestAnimationFrame(frame);
+		draw();
 	</script>
 </body>
