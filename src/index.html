@@ -19,7 +19,7 @@
 		/** full detail, but very slow */
 		const FULL_RES = 1;
 		/** pixelated and looks like crap, but nearly instant */
-		const PREVIEW_RES = 6;
+		const PREVIEW_RES = 8;
 
 		/** how long to wait before rendering in full resolution */
 		const FULLRES_DELAY = 1000;
@@ -34,7 +34,7 @@
 		let viewportY = 0;
 
 		const SCROLL_SENSITIVITY = 1.0015;
-		const DRAG_SENSITIVITY = 0.5;
+		const DRAG_SENSITIVITY = 1;
 
 		const MAX_ITERATIONS = 100;
 
@@ -196,7 +196,7 @@
 			viewportY += (dragDeltaY / viewportScale) * DRAG_SENSITIVITY;
 
 			dragStartX = event.clientX;
-			dragStarY = event.clienY;
+			dragStartY = event.clientY;
 
 			render();
 		});
