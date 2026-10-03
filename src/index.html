@@ -9,11 +9,20 @@
 		canvas {
 			width: 100vw;
 			height: 100vh;
+			image-rendering: pixelated;
 		}
 	</style>
 	<script>
 		/** @type {CanvasRenderingContext2D} */
 		const ctx = c.getContext("2d");
+
+		/** full detail, but very slow */
+		const FULL_RES = 1;
+		/** pixelated and looks like crap, but nearly instant */
+		const PREVIEW_RES = 6;
+
+		/** how long to wait before rendering in full resolution */
+		const FULLRES_DELAY = 200;
 
 		// these two are similar but serve different purposes so let me explain
 		/** this is to see more details of the fractal */
@@ -23,11 +32,14 @@
 
 		const MAX_ITERATIONS = 100;
 
-		c.width = innerWidth / superscaleFactor;
-		c.height = innerHeight / superscaleFactor;
-
-		const imgData = ctx.getImageData(0, 0, c.width, c.height);
-		const pixels = imgData.data;
+		let imgData;
+		let pixels;
+		const updateCanvasDimensions = () => {
+			c.width = innerWidth / superscaleFactor;
+			c.height = innerHeight / superscaleFactor;
+			imgData = ctx.getImageData(0, 0, c.width, c.height);
+			pixels = imgData.data;
+		};
 
 		// https://www.stevenfrady.com/tools/palette?p=0.1,0.5,0.5,1,1,0.81,0.69,1,0.41,0.52,0.5,0.67
 		function getPalette(t) {
@@ -116,6 +128,26 @@
 			ctx.putImageData(imgData, 0, 0);
 		}
 
-		draw();
+		function renderWithScale(scale) {
+			superscaleFactor = scale;
+			updateCanvasDimensions();
+			draw();
+		}
+
+		let fullresTimeout;
+		function render() {
+			clearTimeout(fullresTimeout);
+
+			renderWithScale(PREVIEW_RES);
+
+			fullresTimeout = setTimeout(
+				() => renderWithScale(FULL_RES),
+				FULLRES_DELAY,
+			);
+		}
+
+		window.addEventListener("resize", render);
+
+		render();
 	</script>
 </body>
