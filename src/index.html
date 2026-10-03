@@ -30,6 +30,9 @@
 		/** this is to make rendering cheaper  */
 		let superscaleFactor = 1;
 
+		let viewportX = 0;
+		let viewportY = 0;
+
 		const MAX_ITERATIONS = 100;
 
 		let imgData;
@@ -80,10 +83,12 @@
 				for (let pixelX = 0; pixelX < c.width; pixelX++) {
 					const scaledX =
 						(pixelX - c.width / 2) /
-						(viewportScale / superscaleFactor);
+							(viewportScale / superscaleFactor) +
+						viewportX;
 					const scaledY =
 						(pixelY - c.height / 2) /
-						(viewportScale / superscaleFactor);
+							(viewportScale / superscaleFactor) +
+						viewportY;
 
 					// each complex part of z
 					let real = 0;
