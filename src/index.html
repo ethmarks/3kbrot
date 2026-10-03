@@ -30,8 +30,10 @@
 		/** this is to make rendering cheaper  */
 		let superscaleFactor = 1;
 
-		let viewportX = 0;
+		let viewportX = 0.25;
 		let viewportY = 0;
+
+		const SCROLL_SENSITIVITY = 1.0015;
 
 		const MAX_ITERATIONS = 100;
 
@@ -87,7 +89,7 @@
 						viewportX;
 					const scaledY =
 						(pixelY - c.height / 2) /
-							(viewportScale / superscaleFactor) +
+							(viewportScale / superscaleFactor) -
 						viewportY;
 
 					// each complex part of z
@@ -158,6 +160,11 @@
 		}
 
 		window.addEventListener("resize", render);
+
+		window.addEventListener("wheel", (event) => {
+			viewportScale *= Math.pow(SCROLL_SENSITIVITY, -event.deltaY);
+			render();
+		});
 
 		render();
 	</script>
