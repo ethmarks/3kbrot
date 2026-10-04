@@ -40,10 +40,10 @@ The math to generate the Mandelbrot Set works basically like this:
 _Image from [2swap](https://youtu.be/Ed1gsyxxwM0?t=55)_
 
 Obviously, I can't really apply the equation an _infinite_ number of times, so I
-just approximate it. Mathematically, if ${z_r}^2+{z_i}^2$ ever becomes greater
-than 4, I know that it'll diverge towards infinity and I can just stop there.
-For points that stubbornly refuse to be greater than 4, I can set a max number
-of iterations to check before giving up and assuming that it's in the Mandelbrot
+just approximate it. Mathematically, if $|z|$ ever becomes greater than 2, I
+know that it'll diverge towards infinity and I can just stop there. For points
+that stubbornly refuse to be greater than 2, I can set a max number of
+iterations to check before giving up and assuming that it's in the Mandelbrot
 set so that I don't have to continue checking forever.
 
 ## The colors
@@ -75,6 +75,32 @@ I took the GSLS snippet that the palette generator spat out, translated it to
 JavaScript, and plugged `t` into the formula to get the pixel's color:
 
 ![3kbrot with the palette](.github/palette-fractal.png)
+
+### Optimizations
+
+The Mandelbrot set is not cheap to compute. On a HD screen, the inner loop can
+run up to **207 million** (!!!) times per frame in the worst case. On my laptop,
+it often ran about 18 million times per frame, taking ~600 milliseconds, which
+is obviously way too slow.
+
+That ~600ms number wasn't easy to get, either. It was around ~2000ms before. I
+had to do lots of
+[algorithmic and arithmetic optimizations](https://github.com/ethmarks/3kbrot/commit/45af77aa5997c503913d974c2bce731d360c2327)
+to make it that fast. For example, I pre-computed reciprocals so that I can do
+multiplication instead of division.
+
+But the real optimization was the pixelated preview. I first saw this technique
+on <https://mandel.gart.nz/>. When the user is dragging the viewport or zooming
+or whatever, I render at a tiny resolution and then scale up. 1/8 scale was the
+sweet spot from my testing. It looks pixelated and terrible, but because it
+involves rendering so much fewer pixels, I can render it basically instantly.
+
+![3kbrot at preview resolution](.github/preview.png)
+
+I only render the fractal at full resolution after the user has stopped moving
+for a bit (400ms). I think it's a good compromise, because it keeps navigation
+snappy and responsive, but the user can still see the overall shape so they can
+see what they're doing.
 
 ## License
 
