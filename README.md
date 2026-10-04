@@ -21,17 +21,17 @@ You can also visit <https://ethmarks.github.io/3kbrot/>.
 The math to generate the Mandelbrot set works basically like this:
 
 1. Turn the pixel coordinates into a point on the complex plane, which we'll
-   call $c$
-2. Set $z$ (another complex number) equal to zero and plug $c$ into this
-   equation: $z_{next}=z^2+c$
+   call `c`
+2. Set `z` (another complex number) equal to zero and plug `c` into this
+   equation: `z_next = z^2 + c`
 3. Take the result of the equation and plug it back into the equation as the new
-   value of $z$
+   value of `z`
 4. Repeat step 3 an infinite number of times
 5. If, after applying the equation an infinite number of times, the output is
-   still fairly small, then $c$ is in the Mandelbrot set. If it's approaching
+   still fairly small, then `c` is in the Mandelbrot set. If it's approaching
    infinity, then it's not in the Mandelbrot set
 6. If it's in the Mandelbrot set, color the pixel black. Otherwise, color it
-   depending on how many iterations it took before $z$ started to diverge
+   depending on how many iterations it took before `z` started to diverge
    towards infinity
 7. Repeat steps 1-6 for every pixel on the screen
 
@@ -40,7 +40,7 @@ The math to generate the Mandelbrot set works basically like this:
 _Image from [2swap](https://youtu.be/Ed1gsyxxwM0?t=55)_
 
 Obviously, I can't really apply the equation an _infinite_ number of times, so I
-just approximate it. Mathematically, if $|z|$ ever becomes greater than 2, I
+just approximate it. Mathematically, if `|z|` ever becomes greater than 2, I
 know that it'll diverge towards infinity and I can just stop there. For points
 that stubbornly refuse to be greater than 2, I can set a max number of
 iterations to check before giving up and assuming that it's in the Mandelbrot
@@ -106,10 +106,10 @@ JavaScript, and plugged `t` into the formula to get the pixel's color:
 
 Remember back when I said:
 
-> Set $z$ (another complex number) equal to zero...
+> Set `z` (another complex number) equal to zero...
 
-You can also chose a different complex number for the initial value of $z$. Here
-what it looks like if you set $z$ to $0.5+0i$:
+You can also chose a different complex number for the initial value of `z`. Here
+what it looks like if you set `z` to `0.5 + 0i`:
 
 ![3kbrot with initial z set to 0.5+0i](.github/initialz_0.5.png)
 
@@ -117,7 +117,7 @@ As crazy as it sounds, I don't know of any other Mandelbrot set viewers that let
 you do this. I've checked about a dozen so far, and although some of them can
 display [Multibrot Sets](https://en.wikipedia.org/wiki/Multibrot_set) and
 [Julia Sets](https://en.wikipedia.org/wiki/Julia_set), none of them let you
-choose the initial $z$ value.
+choose the initial `z` value.
 
 I don't even know what it's called. The
 [Mandelbrot set Wikipedia article](https://en.wikipedia.org/wiki/Mandelbrot_set#Generalizations)
