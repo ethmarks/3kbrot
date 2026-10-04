@@ -10,29 +10,19 @@
 			>
 		</p>
 
-		<p>
-			You can move the viewport by dragging, and you can zoom by
-			scrolling. To change the initial Z value (which changes the shape of
-			the fractal and makes it look wacky), use the inputs below:
-		</p>
-
 		<label for="izr">Inital Z (real)</label>
 		<input id="izr" type="number" step="0.1" />
 
 		<label for="izi">Inital Z (imaginary)</label>
 		<input id="izi" type="number" step="0.1" />
 
-		<p>
-			3kbrot will render a pixelated preview initially (for performance
-			reasons), but after 1 second of inactivity, it'll render the
-			full-quality fractal.
-		</p>
-
 		<footer>
 			By <a href="https://github.com/ethmarks">Ethan Marks</a>
 		</footer>
 	</div>
-	<div id="b"></div>
+
+	<!-- "s" is for "stats"! -->
+	<div id="s"></div>
 	<style>
 		body {
 			margin: 0;
@@ -55,7 +45,7 @@
 			flex-direction: column;
 			max-width: 50ch;
 		}
-		#b {
+		#s {
 			bottom: 0;
 			font-family: monospace;
 		}
@@ -188,12 +178,10 @@
 						// some pixels
 						iterations < MAX_ITERATIONS
 					) {
-						const realNext =
-							real * real - imaginary * imaginary + scaledX;
-						const imaginaryNext = 2 * real * imaginary + scaledY;
-
-						real = realNext;
-						imaginary = imaginaryNext;
+						[real, imaginary] = [
+							real * real - imaginary * imaginary + scaledX,
+							2 * real * imaginary + scaledY,
+						];
 
 						iterations++;
 					}
@@ -224,18 +212,17 @@
 			draw();
 		}
 
-		const r = document.getElementById("r");
-
 		let fullresTimeout;
 		function render() {
-			updateStats();
+			// updates the stats
+			s.textContent = `center: ${viewportX}+${viewportY}i, zoom: ${Math.round(viewportScale / 300)}x`;
 
 			clearTimeout(fullresTimeout);
 
 			renderWithScale(PREVIEW_RES);
 
 			fullresTimeout = setTimeout(() => {
-				r.style.display = "inline";
+				r.style.display = "unset";
 
 				// setTimeout with zero delay, so that the browser can paint
 				// the "(Rendering...)" before the main thread gets blocked.
@@ -274,40 +261,34 @@
 		window.addEventListener("pointercancel", resetDrag);
 
 		window.addEventListener("pointermove", (event) => {
-			if (!isDragging) return;
+			if (isDragging) {
+				const dragDeltaX = event.clientX - centerX;
+				const dragDeltaY = event.clientY - centerY;
 
-			const dragDeltaX = event.clientX - centerX;
-			const dragDeltaY = event.clientY - centerY;
+				viewportX -= (dragDeltaX / viewportScale) * DRAG_SENSITIVITY;
+				viewportY += (dragDeltaY / viewportScale) * DRAG_SENSITIVITY;
 
-			viewportX -= (dragDeltaX / viewportScale) * DRAG_SENSITIVITY;
-			viewportY += (dragDeltaY / viewportScale) * DRAG_SENSITIVITY;
+				centerX = event.clientX;
+				centerY = event.clientY;
 
-			centerX = event.clientX;
-			centerY = event.clientY;
-
-			render();
+				render();
+			}
+			``;
 		});
 
-		const initialZRealEl = document.getElementById("izr");
-		const initialZImaginaryEl = document.getElementById("izi");
+		// initialZRealEl
+		izr.value = 0;
+		// initialZImaginaryEl
+		izi.value = 0;
 
-		initialZRealEl.addEventListener("input", () => {
-			initialZReal = initialZRealEl.value;
+		izr.addEventListener("input", () => {
+			initialZReal = izr.value;
 			render();
 		});
-		initialZImaginaryEl.addEventListener("input", () => {
-			initialZImaginary = initialZImaginaryEl.value;
+		izi.addEventListener("input", () => {
+			initialZImaginary = izi.value;
 			render();
 		});
-
-		initialZRealEl.value = 0;
-		initialZImaginaryEl.value = 0;
-
-		const stats = document.getElementById("b");
-
-		function updateStats() {
-			stats.textContent = `center: ${viewportX}+${viewportY}i, zoom: ${Math.round(viewportScale / 300)}x`;
-		}
 
 		render();
 	</script>
