@@ -89,9 +89,10 @@
 		/** how long to wait before rendering in full resolution */
 		const FULLRES_DELAY = 400;
 
+		const INITIAL_VIEWPORT_SCALE = 300;
+
 		// these two are similar but serve different purposes so let me explain
 		/** this is to see more details of the fractal */
-		const INITIAL_VIEWPORT_SCALE = 300;
 		let viewportScale = INITIAL_VIEWPORT_SCALE;
 		/** this is to make rendering cheaper  */
 		let superscaleFactor = 1;
@@ -293,7 +294,6 @@
 
 				render();
 			}
-			``;
 		});
 
 		// initialZRealEl
