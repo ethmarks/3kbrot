@@ -91,7 +91,8 @@
 
 		// these two are similar but serve different purposes so let me explain
 		/** this is to see more details of the fractal */
-		let viewportScale = 300;
+		const INITIAL_VIEWPORT_SCALE = 300;
+		let viewportScale = INITIAL_VIEWPORT_SCALE;
 		/** this is to make rendering cheaper  */
 		let superscaleFactor = 1;
 
@@ -234,7 +235,7 @@
 		let fullresTimeout;
 		function render() {
 			// updates the stats
-			s.textContent = `center: ${viewportX}+${viewportY}i, zoom: ${Math.round(viewportScale / 300)}x`;
+			s.textContent = `center: ${viewportX}+${viewportY}i, zoom: ${Math.round(viewportScale / INITIAL_VIEWPORT_SCALE)}x`;
 
 			clearTimeout(fullresTimeout);
 
