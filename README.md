@@ -2,7 +2,7 @@
 
 Mandelbrot Set viewer in 3kb
 
-![Screenshot of 3kbrot](.github/screenshot1.png)
+[![Screenshot of 3kbrot](.github/screenshot1.png)](https://ethmarks.github.io/3kbrot/)
 
 ## Demo
 
@@ -27,9 +27,9 @@ The math to generate the Mandelbrot set works basically like this:
 3. Take the result of the equation and plug it back into the equation as the new
    value of `z`
 4. Repeat step 3 an infinite number of times
-5. If, after applying the equation an infinite number of times, the output is
-   still finite, then `c` is in the Mandelbrot set. If it's approaching
-   infinity, then it's not in the Mandelbrot set
+5. If, after applying the equation an infinite number of times, `z` is still
+   bounded, then `c` is in the Mandelbrot set. If `z` shot off towards infinity
+   in some direction, then `c` is not in the Mandelbrot set
 6. If it's in the Mandelbrot set, color the pixel black. Otherwise, color it
    depending on how many iterations it took before `z` started to diverge
    towards infinity
@@ -136,7 +136,7 @@ mentions it, but it doesn't name it either:
 > create distorted shapes that can be interesting, but they are usually not as
 > well-formed as the standard set. Try (0, -0.6), for example.
 
-But anyways, 3kbrot lets you explore how changing the initial Z value affects
+But anyways, 3kbrot lets you explore how changing the initial `z` value affects
 the shape of the fractal; whatever it's called.
 
 ## Code Golf
@@ -154,8 +154,8 @@ minification logic is the same: read the source file, minify with
 
 I hated having to remember to run the build script before each commit, so I used
 [Husky](https://typicode.github.io/husky/) to make a pre-commit hook. I also
-modified the build script to inject info about the URI into the README, which is
-why the README is always up to date.
+modified the build script to inject the URI into the README, which is how the
+demo in the README is always up to date despite my forgetfulness.
 
 The minifier did most of the heavy lifting, so I mostly didn't have to worry
 about golfing variable names and removing whitespace and whatnot. I did exploit
