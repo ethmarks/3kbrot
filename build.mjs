@@ -1,3 +1,8 @@
+//
+// most of this file was copied from the build script from
+// https://shrink.hackclub.com/app/guides/setup
+//
+
 // Turns src/index.html into one data URI. Run: node build.mjs
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { minify } from "terser";
@@ -59,3 +64,16 @@ console.log(
 		" bytes, " +
 		(bytes > LIMIT ? bytes - LIMIT + " over" : LIMIT - bytes + " left"),
 );
+
+//
+// after this is the part that was made by me (Ethan)
+//
+
+const readme = readFileSync("README.md", "utf8");
+
+// this detects the part of the readme where the uri is
+const regex = /```\ndata:text\/html,.*\n```/;
+const backticks = "```";
+const backtickedUri = `${backticks}\n${uri}\n${backticks}`;
+const newReadme = readme.replace(regex, backtickedUri);
+writeFileSync("README.md", newReadme);
