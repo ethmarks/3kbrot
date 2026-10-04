@@ -117,6 +117,8 @@
 
 		// https://www.stevenfrady.com/tools/palette?p=0.1,0.5,0.5,1,1,0.81,0.69,1,0.41,0.52,0.5,0.67
 		function palette(t, colorIndex) {
+			if (t === 0) return 0;
+
 			const a = [0.1, 0.5, 0.5];
 			const b = [1, 1, 0.81];
 			const c = [0.69, 1, 0.41];
@@ -149,22 +151,29 @@
 		}
 
 		function draw() {
-			for (let pixelY = 0; pixelY < c.height; pixelY++) {
-				for (let pixelX = 0; pixelX < c.width; pixelX++) {
-					const scaledX =
-						(pixelX - c.width / 2) /
-							(viewportScale / superscaleFactor) +
-						viewportX;
-					const scaledY =
-						(pixelY - c.height / 2) /
-							(viewportScale / superscaleFactor) -
-						viewportY;
+			// I heard that division is expensive and that I should precompute
+			// it, so I'm precomputing the division
+			const scale = superscaleFactor / viewportScale;
+			const reciprocalMaxIterations = 1 / MAX_ITERATIONS;
+			const halfWidth = c.width / 2;
+			const halfHeight = c.height / 2;
 
+			let pixelIndex = 0;
+
+			let scaledY = -halfHeight * scale - viewportY;
+
+			for (let pixelY = 0; pixelY < c.height; pixelY++) {
+				let scaledX = -halfWidth * scale + viewportX;
+
+				for (let pixelX = 0; pixelX < c.width; pixelX++) {
 					// each complex part of z
 					let real = initialZReal;
 					let imaginary = initialZImaginary;
 
 					let iterations = 0;
+
+					let realSquared = real * real;
+					let imaginarySquared = imaginary * imaginary;
 
 					while (
 						// escape condition cuz if the magnitude of z is ever
@@ -174,34 +183,43 @@
 						// -> |z| < 2
 						// -> sqrt(re^2 + im^2) < 2
 						// -> re^2 + im^2 < 4
-						real * real + imaginary * imaginary < 4 &&
+						realSquared + imaginarySquared < 4 &&
 						// because otherwise we'd never stop calculating for
 						// some pixels
 						iterations < MAX_ITERATIONS
 					) {
-						[real, imaginary] = [
-							real * real - imaginary * imaginary + scaledX,
-							2 * real * imaginary + scaledY,
-						];
+						const realNext =
+							realSquared - imaginarySquared + scaledX;
+						const imaginaryNext = 2 * real * imaginary + scaledY;
+
+						real = realNext;
+						imaginary = imaginaryNext;
+
+						realSquared = real * real;
+						imaginarySquared = imaginary * imaginary;
 
 						iterations++;
 					}
 
-					const pixelIndex = (pixelY * c.width + pixelX) * 4;
+					if (iterations === MAX_ITERATIONS) {
+						setPixel(pixelIndex, 0);
+					} else {
+						// https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set#Continuous_(smooth)_coloring
+						const nu = Math.log2(
+							Math.log2(realSquared + imaginarySquared),
+						);
+						const smoothIterations = iterations + 1 - nu;
 
-					// https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set#Continuous_(smooth)_coloring
-					const nu = Math.log2(
-						Math.log2(real * real + imaginary * imaginary),
-					);
-					const smoothIterations = iterations + 1 - nu;
+						const t = smoothIterations * reciprocalMaxIterations;
 
-					const t =
-						smoothIterations === MAX_ITERATIONS
-							? 0
-							: smoothIterations / MAX_ITERATIONS;
+						setPixel(pixelIndex, t);
+					}
 
-					setPixel(pixelIndex, t);
+					pixelIndex += 4;
+					scaledX += scale;
 				}
+
+				scaledY += scale;
 			}
 
 			ctx.putImageData(imgData, 0, 0);
