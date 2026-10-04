@@ -28,7 +28,7 @@ The math to generate the Mandelbrot set works basically like this:
    value of `z`
 4. Repeat step 3 an infinite number of times
 5. If, after applying the equation an infinite number of times, the output is
-   still fairly small, then `c` is in the Mandelbrot set. If it's approaching
+   still finite, then `c` is in the Mandelbrot set. If it's approaching
    infinity, then it's not in the Mandelbrot set
 6. If it's in the Mandelbrot set, color the pixel black. Otherwise, color it
    depending on how many iterations it took before `z` started to diverge
@@ -41,10 +41,12 @@ _Image from [2swap](https://youtu.be/Ed1gsyxxwM0?t=55)_
 
 Obviously, I can't really apply the equation an _infinite_ number of times, so I
 just approximate it. Mathematically, if `|z|` ever becomes greater than 2, I
-know that it'll diverge towards infinity and I can just stop there. For points
-that stubbornly refuse to be greater than 2, I can set a max number of
-iterations to check before giving up and assuming that it's in the Mandelbrot
-set so that I don't have to continue checking forever.
+know that it'll diverge towards infinity and I can just stop there.
+
+For points that take a long time to become greater than 2, I can set a max
+number of iterations to check before giving up and just assuming that it's in
+the Mandelbrot set. This is technically a lossy approximation, but there isn't
+really a viable alternative.
 
 ### Optimizations
 
@@ -53,8 +55,8 @@ run up to **207 million** (!!!) times per frame in the worst case. On my laptop,
 it often ran about 18 million times per frame, taking ~600 milliseconds, which
 is obviously way too slow.
 
-That ~600ms number wasn't easy to get, either. It was around ~2000ms before. I
-had to do lots of
+That's not to say that ~600ms render time was easy to get. It used to be
+~2000ms. I had to do lots of
 [algorithmic and arithmetic optimizations](https://github.com/ethmarks/3kbrot/commit/45af77aa5997c503913d974c2bce731d360c2327)
 to make it that fast. For example, I pre-computed reciprocals so that I can do
 multiplication instead of division.
@@ -162,6 +164,27 @@ tags, so rather than doing `document.getElementById("c").getContext("2d")`, I
 could just do `c.getContext("2d")`.
 
 The final URI weighs 2612 bytes!
+
+## Acknowledgements
+
+Credits:
+
+- Thanks to [Steven Frady](https://github.com/sFrady20) for making
+  [this palette generator](https://www.stevenfrady.com/tools/palette)
+- Thanks to [Anson Chung](https://github.com/anscg) for making the Shrink
+  minifier
+- Thanks to all the people who wrote the
+  [Plotting algorithms for the Mandelbrot set](https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set)
+  Wikipedia article
+
+Inspirations:
+
+- [2swap's Mandelbrot video](https://youtu.be/Ed1gsyxxwM0), which made me
+  realize how cool the Mandelbrot set is
+- [mandelbrot.site](https://mandelbrot.site/), which gave me the idea to make a
+  Mandelbrot viewer
+- [mandel.gart.nz](https://mandel.gart.nz/), which introduced me to the preview
+  resolution optimization
 
 ## License
 
