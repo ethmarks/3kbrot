@@ -16,9 +16,9 @@ You can also visit <https://ethmarks.github.io/3kbrot/>.
 
 ## How it Works
 
-### The math
+### Math
 
-The math to generate the Mandelbrot Set works basically like this:
+The math to generate the Mandelbrot set works basically like this:
 
 1. Turn the pixel coordinates into a point on the complex plane, which we'll
    call $c$
@@ -46,7 +46,33 @@ that stubbornly refuse to be greater than 2, I can set a max number of
 iterations to check before giving up and assuming that it's in the Mandelbrot
 set so that I don't have to continue checking forever.
 
-## The colors
+### Optimizations
+
+The Mandelbrot set is not cheap to compute. On a HD screen, the inner loop can
+run up to **207 million** (!!!) times per frame in the worst case. On my laptop,
+it often ran about 18 million times per frame, taking ~600 milliseconds, which
+is obviously way too slow.
+
+That ~600ms number wasn't easy to get, either. It was around ~2000ms before. I
+had to do lots of
+[algorithmic and arithmetic optimizations](https://github.com/ethmarks/3kbrot/commit/45af77aa5997c503913d974c2bce731d360c2327)
+to make it that fast. For example, I pre-computed reciprocals so that I can do
+multiplication instead of division.
+
+But the real optimization was the pixelated preview. I first saw this technique
+on <https://mandel.gart.nz/>. When the user is dragging the viewport or zooming
+or whatever, I render at a tiny resolution and then scale up. 1/8 scale was the
+sweet spot from my testing. It looks pixelated and terrible, but because it
+involves rendering so much fewer pixels, I can render it basically instantly.
+
+![3kbrot at preview resolution](.github/preview.png)
+
+I only render the fractal at full resolution after the user has stopped moving
+for a bit (400ms). I think it's a good compromise, because it keeps navigation
+snappy and responsive, but the user can still see the overall shape so they can
+see what they're doing.
+
+### Colors
 
 Coloring points inside the Mandelbrot set is easy because it's just pure black,
 but there are lots of ways to color points outside of it. The math part produces
@@ -76,33 +102,7 @@ JavaScript, and plugged `t` into the formula to get the pixel's color:
 
 ![3kbrot with the palette](.github/palette-fractal.png)
 
-### Optimizations
-
-The Mandelbrot set is not cheap to compute. On a HD screen, the inner loop can
-run up to **207 million** (!!!) times per frame in the worst case. On my laptop,
-it often ran about 18 million times per frame, taking ~600 milliseconds, which
-is obviously way too slow.
-
-That ~600ms number wasn't easy to get, either. It was around ~2000ms before. I
-had to do lots of
-[algorithmic and arithmetic optimizations](https://github.com/ethmarks/3kbrot/commit/45af77aa5997c503913d974c2bce731d360c2327)
-to make it that fast. For example, I pre-computed reciprocals so that I can do
-multiplication instead of division.
-
-But the real optimization was the pixelated preview. I first saw this technique
-on <https://mandel.gart.nz/>. When the user is dragging the viewport or zooming
-or whatever, I render at a tiny resolution and then scale up. 1/8 scale was the
-sweet spot from my testing. It looks pixelated and terrible, but because it
-involves rendering so much fewer pixels, I can render it basically instantly.
-
-![3kbrot at preview resolution](.github/preview.png)
-
-I only render the fractal at full resolution after the user has stopped moving
-for a bit (400ms). I think it's a good compromise, because it keeps navigation
-snappy and responsive, but the user can still see the overall shape so they can
-see what they're doing.
-
-### Initial Z
+## Initial Z
 
 Remember back when I said:
 
@@ -136,6 +136,32 @@ mentions it, but it doesn't name it either:
 
 But anyways, 3kbrot lets you explore how changing the initial Z value affects
 the shape of the fractal; whatever it's called.
+
+## Code Golf
+
+I made 3kbrot for [Shrink YSWS](https://shrink.hackclub.com/), which meant that
+I had to make it a single HTML file with zero network requests that can be
+minified into a
+[data URI](https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/data)
+that's less than 3072 bytes.
+
+For the minifier, I lightly adapted the build script in
+[the Shrink guide](https://shrink.hackclub.com/app/guides/setup). The core
+minification logic is the same: read the source file, minify with
+[Terser](terser.org), compose into data URI, and write the minified file.
+
+I hated having to remember to run the build script before each commit, so I used
+[Husky](https://typicode.github.io/husky/) to make a pre-commit hook. I also
+modified the build script to inject info about the URI into the README, which is
+why the README is always up to date.
+
+The minifier did most of the heavy lifting, so I mostly didn't have to worry
+about golfing variable names and removing whitespace and whatnot. I did exploit
+the fact that JS automatically exposes variables corresponding to the ID of HTML
+tags, so rather than doing `document.getElementById("c").getContext("2d")`, I
+could just do `c.getContext("2d")`.
+
+The final URI weighs 2612 bytes!
 
 ## License
 

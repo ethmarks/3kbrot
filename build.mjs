@@ -69,11 +69,12 @@ console.log(
 // after this is the part that was made by me (Ethan)
 //
 
-const readme = readFileSync("README.md", "utf8");
+let readme = readFileSync("README.md", "utf8");
 
-// this detects the part of the readme where the uri is
-const regex = /```\ndata:text\/html,.*\n```/;
-const backticks = "```";
-const backtickedUri = `${backticks}\n${uri}\n${backticks}`;
-const newReadme = readme.replace(regex, backtickedUri);
-writeFileSync("README.md", newReadme);
+readme = readme
+	// this one does the demo URI
+	.replace(/```\ndata:text\/html,.*\n```/, `\`\`\`\n${uri}\n\`\`\``)
+
+	// this one does the byte count
+	.replace(/final URI weighs .* bytes/, `final URI weighs ${bytes} bytes`);
+writeFileSync("README.md", readme);
